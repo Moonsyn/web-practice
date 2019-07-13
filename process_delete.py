@@ -10,7 +10,6 @@ import cgitb
 cgitb.enable()
 form = cgi.FieldStorage()
 pageId = form["pageId"].value
-
 os.remove("data/"+pageId)
 
 #Redirection

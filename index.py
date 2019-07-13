@@ -1,18 +1,34 @@
 #!C:\Users\msy94\AppData\Local\Programs\Python\Python37\python.exe
 #!python3
 #-*- coding: utf-8 -*-
-import sys
-import codecs
+import sys, codecs, os
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
-import cgi
-import cgitb
+import cgi, cgitb
+import view
 cgitb.enable()
 print("Content-Type: text/html; charset=utf-8\r\n")
 print()
 form = cgi.FieldStorage()
-if form:
-    pageId = form["id"].value
-    print(pageId)
+from html_sanitizer import Sanitizer
+sanitizer = Sanitizer()
+if "id" in form:
+  title = pageId = form["id"].value
+  description = open("data/"+pageId, encoding="utf-8").read()
+  description = sanitizer.sanitize(description)
+  title = sanitizer.sanitize(title)
+  update_link = "<a href = 'update.py?id={pageId}'>update</a>".format(pageId = pageId)
+  delete_action = '''
+  <form action="process_delete.py" method="post">
+    <input type = "hidden" name = "pageId" value="{}">
+    <input type = "submit" value = "delete">
+  </form>
+  '''.format(pageId)
+else:
+  title = pageId = "Welcome"
+  description = "Hello Web"
+  update_link = ""
+  delete_action = ""
+print(pageId)
 print("""<!DOCTYPE html>
 <html lang="KR" dir="ltr">
   <head>
@@ -20,7 +36,10 @@ print("""<!DOCTYPE html>
     <title>{title}</title>
   </head>
   <body>
-    <h1><a href="index.py?id=airsoft hobby">승진이는 악마다</a></h1>
+    <h1><a href="index2.py?id=Angel">{desc}</a></h1>
+    <a href = "create.py">create</a>
+    {update_link}
+    {delete_action}
     <h2><strong>1.WE 베레타(M9시리즈)</strong></h2>
     <h3><a href="https://www.kyairsoft.com/we-m002-m925-m92-chrome.html" target="_blank">WE-M002-M925 M92 (CHROME)</a></h3><br>
     <img src="img_39318_3.jpg", width = 40%><br>
@@ -43,6 +62,10 @@ print("""<!DOCTYPE html>
     가격 155 달러<br>
     CO2탄을 사용한다. 한 손으로 드르륵 갈길 수 있는게 매력.<br>
     KWC사가 2017년 전에 만든 가스총은 MP7말고 다 ㅄ이었다는게 불안 요소
+    <ol>
+      {listdir}
+    </ol>
   </body>
 </html>
-""".format(title="Hello"))
+""".format(title = title, desc = description, 
+listdir = view.getList(), update_link = update_link, delete_action = delete_action))

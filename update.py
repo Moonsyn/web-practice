@@ -6,7 +6,7 @@ import codecs
 import os
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout.detach())
 import cgi
-import cgitb
+import cgitb, view
 cgitb.enable()
 print("Content-Type: text/html; charset=utf-8\r\n")
 print()
@@ -18,9 +18,6 @@ else:
   pageId = "Welcome"
   description = "Hello Web"
 print(pageId)
-number_list = ""
-for file in os.listdir("C:/Bitnami/wampstack-7.3.6-2/apache2/htdocs/data"):
-  number_list = number_list + "<li><a href = 'index.py?id={name}'>{name}</a></li>".format(name = file)
 print("""<!DOCTYPE html>
 <html lang="KR" dir="ltr">
   <head>
@@ -41,4 +38,4 @@ print("""<!DOCTYPE html>
     </ol>
   </body>
 </html>
-""".format(title="Airsoft Hobby", desc = description, listdir = number_list, form_default_title = pageId, form_default_description = description))
+""".format(title="Airsoft Hobby", desc = description, listdir = view.getList(), form_default_title = pageId, form_default_description = description))
